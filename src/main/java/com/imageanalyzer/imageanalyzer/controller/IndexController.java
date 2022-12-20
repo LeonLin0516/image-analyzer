@@ -26,14 +26,4 @@ public class IndexController {
         return "index";
     }
 
-    @PostMapping(value = "/")
-    public String getInputImage(@RequestParam("image") MultipartFile file) throws IOException {
-        System.out.println("get input image");
-        System.out.println(file.getOriginalFilename());
-        System.out.println(file.getContentType());
-        byte[] bytes = file.getBytes();
-        System.out.println(bytes.length);
-        return "redirect:/";
-    }
-
 }
