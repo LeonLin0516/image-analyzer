@@ -29,6 +29,21 @@ public class ContourDetectionController {
     @PostMapping("contour_detection")
     public String detectContour(@RequestParam("image") MultipartFile file) throws IOException, InterruptedException {
 
+        HttpClient client = HttpClient.newHttpClient();
+        HttpRequest request;
+        HttpResponse<byte[]> response;
+        int statusCode;
+
+        System.out.println("content type = " + file.getContentType());
+        request = HttpRequest
+                .newBuilder(URI.create(endpoint + "test"))
+                .header("content-type", file.getContentType())
+                .POST(HttpRequest.BodyPublishers.ofByteArray(file.getBytes()))
+                .build();
+        response = client.send(request, HttpResponse.BodyHandlers.ofByteArray());
+        statusCode = response.statusCode();
+
+        System.out.println("code = " + statusCode);
 
         // get the input image and create a File object
         File outputFile = new File("src/main/resources/static/images/" + fileName);
@@ -37,27 +52,6 @@ public class ContourDetectionController {
         FileOutputStream outputStream = new FileOutputStream(outputFile);
         outputStream.write(file.getBytes());
         outputStream.close();
-
-        // test endpoint call 1
-        HttpClient client = HttpClient.newHttpClient();
-        HttpRequest request = HttpRequest
-                .newBuilder(URI.create(endpoint))
-                .build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        int statusCode = response.statusCode();
-        System.out.println("code = " + statusCode);
-
-        // test endpoint call 2
-        System.out.println("content type = " + file.getContentType());
-        request = HttpRequest
-                .newBuilder(URI.create(endpoint + "test"))
-                .header("content-type", file.getContentType())
-                .POST(HttpRequest.BodyPublishers.ofByteArray(file.getBytes()))
-                .build();
-        response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        statusCode = response.statusCode();
-        System.out.println("code = " + statusCode);
-        System.out.println("body = " + response.body());
 
         return "redirect:/contour_detection";
     }
