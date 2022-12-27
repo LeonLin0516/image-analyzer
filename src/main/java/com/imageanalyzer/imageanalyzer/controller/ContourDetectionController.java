@@ -11,12 +11,12 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.URI;
-import java.net.URL;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
@@ -34,12 +34,14 @@ public class ContourDetectionController {
     ImageStorageService storageService;
 
     @GetMapping("contour_detection")
-    public String contourDetection() {
+    public String contourDetection(RedirectAttributes attributes, Model model) {
         return "contour_detection";
     }
 
-    @RequestMapping("contour_detection")
+    @PostMapping("contour_detection/upload")
     public String detectContour(@RequestParam("image") MultipartFile file) throws IOException, InterruptedException {
+
+        System.out.println("post mapping cd/upload");
 
         // get the input image and create a File object
         File outputFile = new File("./images/" + before);
@@ -74,7 +76,7 @@ public class ContourDetectionController {
         outputStream.write(response.body());
         outputStream.close();
 
-        return "redirect:contour_detection/result";
+        return "redirect:/contour_detection/result";
     }
 
     @GetMapping("/images/{filename:.+}")
@@ -86,14 +88,15 @@ public class ContourDetectionController {
     }
 
     @GetMapping("contour_detection/result")
-    public String getResult(Model model) {
+    public String getResult(RedirectAttributes attributes) {
         List<ImageInfo> imageInfoList = new ArrayList<>();
         imageInfoList.add(new ImageInfo(
-            before, MvcUriComponentsBuilder.fromMethodName(ContourDetectionController.class, "getImage", before).build().toString()
+                before, MvcUriComponentsBuilder.fromMethodName(ContourDetectionController.class, "getImage", before).build().toString()
         ));
         imageInfoList.add(new ImageInfo(
-            after, MvcUriComponentsBuilder.fromMethodName(ContourDetectionController.class, "getImage", after).build().toString()
+                after, MvcUriComponentsBuilder.fromMethodName(ContourDetectionController.class, "getImage", after).build().toString()
         ));
+        attributes.addFlashAttribute("result", imageInfoList);
         return "redirect:/contour_detection";
     }
 

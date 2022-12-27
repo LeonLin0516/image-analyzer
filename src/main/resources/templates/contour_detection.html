@@ -6,17 +6,21 @@
 </head>
 <body>
 
-<main>
-    <form action="" method="post" enctype="multipart/form-data">
-        <div>
-            <label for="image">Image:</label>
-            <input name="image" id="image" type="file" accept="image/png, image/gif, image/jpeg" />
-        </div>
-        <button type="submit">
-            Submit
-        </button>
-    </form>
-</main>
+<form th:action="@{contour_detection/upload}" method="post" enctype="multipart/form-data">
+    <div>
+        <label for="image">Image:</label>
+        <input name="image" id="image" type="file" accept="image/png, image/gif, image/jpeg" />
+    </div>
+    <button type="submit">
+        Submit
+    </button>
+</form>
+
+<div th:if="${result != null}">
+    <div th:each="img : ${result}">
+        <img th:src="@{${img.url}}" alt="${img.name}" height="180px">
+    </div>
+</div>
 
 </body>
 </html>
